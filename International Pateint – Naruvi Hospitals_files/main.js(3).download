@@ -1,0 +1,976 @@
+/*-------------------------------------
+Template name:  	ddoctors
+Version:        	1.0
+Author Name:        wpWax
+---------------------------------------
+JS INDEX
+=======================================
+
+#. Preloader
+#. Category Slider
+#. Counter Up
+#. Range Slider
+#. Contact Button
+#. Sidebar Collapse
+#. Search Categories
+#. Search Home
+#. Mobile Menu
+#. Search Field Action
+#. Tooltip
+#. Accordion
+#. Rating
+#. Free Consultation
+
+---------------------------------------*/
+
+"use strict";
+
+(function ($) {
+  var theme = {
+    /* Preloader  */
+    preloader: function () {
+      if ($("#theme-preloader") !== null) {
+        $("#theme-preloader").fadeOut("slow", function () {
+          $(this).remove();
+        });
+      }
+    },
+
+    /* Favourite Button */
+    favouriteButton: function () {
+      const requireLoggedIn = document.querySelector(
+        ".directorist-single-listing-action-quick .directorist-action-save .atbdp-require-login"
+      );
+      const saveButton = document.querySelector(
+        ".directorist-single-listing-action-quick .directorist-action-save"
+      );
+      const saveButtonIcon = document.querySelector(
+        ".directorist-single-listing-action-quick .directorist-action-save .directorist-icon-mask.directorist-added-to-favorite"
+      );
+
+      if (requireLoggedIn || saveButton || saveButtonIcon) {
+        function favouriteInitial() {
+          if (!requireLoggedIn) {
+            if (saveButtonIcon) {
+              saveButton.classList.add("directorist-added-to-favorite");
+            } else {
+              saveButton.classList.remove("directorist-added-to-favorite");
+            }
+          }
+        }
+
+        function favouriteAdded() {
+          const saveButtonIcon = document.querySelector(
+            ".directorist-single-listing-action-quick .directorist-action-save .directorist-icon-mask.directorist-added-to-favorite"
+          );
+          if (!requireLoggedIn) {
+            if (saveButtonIcon) {
+              saveButton.classList.remove("directorist-added-to-favorite");
+            } else {
+              saveButton.classList.add("directorist-added-to-favorite");
+            }
+          }
+        }
+
+        favouriteInitial();
+
+        $("body").on(
+          "click",
+          ".directorist-single-listing-action-quick .directorist-action-save",
+          function (e) {
+            favouriteAdded();
+          }
+        );
+      }
+    },
+
+    /* svg */
+
+    svgInline: function () {
+      $("img.svg").each(function () {
+        var $img = $(this);
+        var imgID = $img.attr("id");
+        var imgClass = $img.attr("class");
+        var imgURL = $img.attr("src");
+
+        $.get(
+          imgURL,
+          function (data) {
+            // Get the SVG tag, ignore the rest
+            var $svg = jQuery(data).find("svg");
+
+            // Add replaced image's ID to the new SVG
+            if (typeof imgID !== "undefined") {
+              $svg = $svg.attr("id", imgID);
+            }
+            // Add replaced image's classes to the new SVG
+            if (typeof imgClass !== "undefined") {
+              $svg = $svg.attr("class", imgClass + " replaced-svg");
+            }
+
+            // Remove any invalid XML tags as per http://validator.w3.org
+            $svg = $svg.removeAttr("xmlns:a");
+
+            // Replace image with new SVG
+            $img.replaceWith($svg);
+          },
+          "xml"
+        );
+      });
+    },
+
+    /* Accordion  */
+    accordion: function () {
+      if ($(".theme-accordion__wrapper") !== null) {
+        $(".theme-accordion__wrapper > h6 > a").on("click", function () {
+          const $this = $(this);
+          $this
+            .parent()
+            .parents(".theme-accordion__wrapper")
+            .toggleClass("selected");
+          $this
+            .parent()
+            .parents(".theme-accordion__wrapper")
+            .siblings(".theme-accordion__wrapper")
+            .removeClass("selected");
+        });
+      }
+    },
+
+    /* Return to top */
+    returnTop: function () {
+      // ===== Scroll to Top ====
+      $(document).ready(function () {
+        var e = document.querySelector(
+            ".scroll-top-wrap .progress-circle path"
+          ),
+          t = e.getTotalLength();
+        (e.style.transition = e.style.WebkitTransition = "none"),
+          (e.style.strokeDasharray = t + " " + t),
+          (e.style.strokeDashoffset = t),
+          e.getBoundingClientRect(),
+          (e.style.transition = e.style.WebkitTransition =
+            "stroke-dashoffset 10ms linear");
+        var o = function () {
+          var o = $(window).scrollTop(),
+            r = $(document).height() - $(window).height(),
+            i = t - (o * t) / r;
+          e.style.strokeDashoffset = i;
+        };
+        o(), $(window).scroll(o);
+        jQuery(window).on("scroll", function () {
+          jQuery(this).scrollTop() > 50
+            ? jQuery(".scroll-top-wrap").addClass("active-progress")
+            : jQuery(".scroll-top-wrap").removeClass("active-progress");
+        }),
+          jQuery(".scroll-top-wrap").on("click", function ($) {
+            return (
+              $.preventDefault(),
+              jQuery("html, body").animate(
+                {
+                  scrollTop: 0,
+                },
+                550
+              ),
+              !1
+            );
+          });
+      });
+    },
+
+    /* Magnific Popup  */
+    magnificPopup: function () {
+      if ($(".video-iframe").length > 0) {
+        $(".video-iframe").magnificPopup({
+          disableOn: 700,
+          type: "iframe",
+          mainClass: "mfp-fade",
+          removalDelay: 160,
+          preloader: false,
+          fixedContentPos: false,
+        });
+      }
+
+      if ($("#theme-single-listing-slider").length !== 0) {
+        $("#theme-single-listing-slider").magnificPopup({
+          delegate: "a",
+          type: "image",
+          tLoading: "Loading image #%curr%...",
+          mainClass: "mfp-img-mobile",
+          gallery: {
+            enabled: true,
+            navigateByImgClick: true,
+            preload: [0, 1], // Will preload 0 - before current, and 1 after the current image
+          },
+          image: {
+            tError:
+              '<a href="%url%">The image #%curr%</a> could not be loaded.',
+            titleSrc: function (item) {
+              return (
+                item.el.attr("title") + "<small>by Marsel Van Oosten</small>"
+              );
+            },
+          },
+          zoom: {
+            enabled: true,
+            duration: 300, // don't foget to change the duration also in CSS
+            opener: function (element) {
+              return element.find("img");
+            },
+          },
+        });
+      }
+    },
+
+    /* Select 2 Support */
+
+    select2Custom: function () {
+      if (
+        $(
+          ".ddoctors-gender-select-js,.ddoctors-select-age-js,.directorist-review-select-js,.ddoctors-tag-select-js,.directorist-category-select"
+        ).length > 0
+      ) {
+        $(
+          ".ddoctors-gender-select-js,.ddoctors-select-age-js,.directorist-review-select-js,.ddoctors-tag-select-js,.directorist-category-select"
+        ).select2({
+          minimumResultsForSearch: Infinity,
+          allowClear: true,
+        });
+      }
+    },
+
+    /* Counter up */
+    counterUpPlugin: function () {
+      const counterUp = window.counterUp.default;
+
+      const callback = (entries) => {
+        entries.forEach((entry) => {
+          const el = entry.target;
+          if (entry.isIntersecting && !el.classList.contains("is-visible")) {
+            counterUp(el, {
+              duration: 2000,
+              delay: 16,
+            });
+            el.classList.add("is-visible");
+          }
+        });
+      };
+
+      const IO = new IntersectionObserver(callback, {
+        threshold: 1,
+      });
+
+      const el = document
+        .querySelectorAll(".theme-counter__counter")
+        .forEach(function (element) {
+          IO.observe(element);
+        });
+    },
+
+    /* Sidebar Collapse  */
+    sidebarCollapse: function () {
+      var myVariable =
+        ".direcorist-search-field-review .filter-checklist__label,.direcorist-search-field-ddoctors-age label:first-child,.direcorist-search-field-tag label:first-child,.direcorist-search-field-radio label:first-child,.direcorist-search-field-ddoctors-gender label:first-child,.direcorist-search-field-checkbox label:first-child";
+      var collapseSelectors = $(
+        'div[class^="directorist-advanced-filter__"] .sidebar-icon'
+      );
+      if ($(myVariable !== null) && collapseSelectors.length < 1) {
+        $(myVariable).append("<span class='sidebar-icon'></span>");
+        const toggles = document.querySelectorAll(myVariable);
+        toggles.forEach((toggle) => {
+          toggle.addEventListener("click", () => {
+            toggle.parentNode.classList.toggle("active");
+          });
+          toggle.parentNode.classList.add("active");
+        });
+      }
+    },
+
+    /* Responsive Menu Trigger */
+    responsiveMenuTrigger: function () {
+      const menuArea = document.querySelector(".mainmenu__menu");
+      const navCollapse = ddoctors_localize_data.resmenuWidth;
+      const windowWidth = window.innerWidth;
+
+      if (navCollapse >= windowWidth) {
+        document.querySelector("html").classList.add("trigger-res-nav");
+        menuArea && menuArea.classList.add("theme-responsive-menu");
+      } else {
+        document.querySelector("html").classList.remove("trigger-res-nav");
+        menuArea && menuArea.classList.remove("theme-responsive-menu");
+      }
+    },
+
+    /* Mobile Menu  */
+    mobileMenu: function (dropDownTrigger, dropDown) {
+      $("body").on("click", ".theme-responsive-menu a", function (e) {
+        if ($(this).parent().hasClass("menu-item-has-children")) {
+          e.preventDefault();
+        }
+        if ($(this).closest(".trigger-res-nav")) {
+          $(this).parent().toggleClass("theme-submenu-open");
+
+          $(this)
+            .siblings(dropDown)
+            .slideToggle()
+            .parent()
+            .siblings(".sub-menu")
+            .children(dropDown)
+            .slideUp()
+            .siblings(dropDownTrigger)
+            .parent()
+            .removeClass("theme-submenu-open");
+        }
+      });
+      $(".navbar-toggler").on("click", function (e) {
+        $(".navbar-collapse ").addClass("show");
+      });
+
+      $(
+        ".menu-area .mainmenu__menu ul li.multi-column-menu > ul.sub-menu > li ul li.current-menu-item"
+      )
+        .closest(".menu-area .mainmenu__menu ul li.multi-column-menu")
+        .addClass("current-menu-parent");
+
+      $(".admin-bar .search-menu").each(function () {
+        $(this).css({
+          top: $("#wpadminbar").outerHeight() + "px",
+        });
+      });
+      $(".theme-dir-dashboard .content-area").each(function () {
+        $(this).css({
+          "margin-top": $(".theme-header-area").outerHeight() + "px",
+        });
+      });
+      $(".directorist-user-dashboard").each(function () {
+        $(this).css({
+          "padding-top":
+            $(".theme-dir-dashboard .dashboard-menu-area").outerHeight() +
+            20 +
+            "px",
+        });
+      });
+
+      if ($("#theme-nav-close") !== null) {
+        $(".theme-nav-close").on("click", function () {
+          $(".trigger-res-nav #ddoctors-navbar-collapse").removeClass("show");
+        });
+      }
+
+      $(window).on("resize, load", function (event) {
+        $(window).scroll(function (e) {
+          e.preventDefault();
+          var scroll = $(window).scrollTop();
+          if ($(window).width() < 601 && scroll > 46) {
+            $(".menu-area.sticky-top").addClass("admin-top-remove");
+          } else {
+            $(".menu-area.sticky-top").removeClass("admin-top-remove");
+          }
+        });
+      });
+    },
+
+    /* Range Slider  */
+    sliderRange: function () {
+      let slider_ranges = document.querySelector(".slider-range");
+      if (slider_ranges) {
+        var slider_range = $(".slider-range");
+        var priceRangeMin = Number(
+          $(".pricing-range__values").attr("data-min-price")
+        );
+        var priceRangeMax = Number(
+          $(".pricing-range__values").attr("data-max-price")
+        );
+        var priceCurrency = $(".pricing-range__values").attr(
+          "data-currency-symbol"
+        );
+
+        slider_range.each(function () {
+          $(this).slider({
+            range: true,
+            min: priceRangeMin === "" ? 0 : priceRangeMin,
+            max: priceRangeMax,
+            values: [priceRangeMin, priceRangeMax],
+            slide: function (event, ui) {
+              $(".amount").text(
+                priceCurrency +
+                  ui.values[0] +
+                  " - " +
+                  priceCurrency +
+                  ui.values[1]
+              );
+              $(".price-range__input-values__min").val(ui.values[0]);
+              $(".price-range__input-values__max").val(ui.values[1]);
+            },
+          });
+        });
+
+        $(".amount").text(
+          priceCurrency +
+            slider_range.slider("values", 0) +
+            " - " +
+            priceCurrency +
+            slider_range.slider("values", 1)
+        );
+        $(".price-range__input-values__min").val(
+          slider_range.slider("values", 0)
+        );
+        $(".price-range__input-values__max").val(
+          slider_range.slider("values", 1)
+        );
+
+        var reset_slider = function (slider_selector) {
+          // Reset the sliders to their original min/max values
+          $(slider_selector).each(function () {
+            var options = $(this).slider("option");
+            console.log(options);
+            $(this).slider("values", [priceRangeMin, priceRangeMax]);
+            $(this)
+              .next()
+              .find(".amount")
+              .html(`${priceRangeMin} - ${priceRangeMax}`);
+          });
+        };
+
+        $(".directorist-btn-reset-js").on("click", () => {
+          reset_slider(".slider-range");
+          // $(".slider-range").slider("option", "values", [0, 0]);
+        });
+      }
+    },
+
+    /* Search Field Action  */
+    searchFieldsAction: function () {
+      $(document).on("click", "load", function () {
+        $(".search_module,.navbar-nav").removeClass("active");
+      });
+    },
+
+    /* Rating */
+    rating: function () {
+      const ratingWrapper = document.querySelectorAll(".theme-rating");
+      ratingWrapper.forEach((elm, ind) => {
+        const dataRating = elm.getAttribute("data-rating");
+        const dataRatingFloat = parseFloat(dataRating);
+        switch (dataRatingFloat) {
+          case 1:
+            elm.classList.add("one");
+            break;
+          case 2:
+            elm.classList.add("two");
+            break;
+          case 3:
+            elm.classList.add("three");
+            break;
+          case 4:
+            elm.classList.add("four");
+            break;
+          case 5:
+            elm.classList.add("five");
+            break;
+          default:
+            elm.classList.add("none");
+        }
+
+        function fractionClass(v1, v2, classOne, classTwo) {
+          if (dataRatingFloat > v1 && dataRatingFloat < v2) {
+            elm.classList.add(classOne, classTwo);
+          }
+        }
+
+        fractionClass(1, 2, "one", "one-n-half");
+        fractionClass(2, 3, "two", "two-n-half");
+        fractionClass(3, 4, "three", "three-n-half");
+        fractionClass(4, 5, "four", "four-n-half");
+      });
+    },
+
+    /* Tooltip  */
+    toolTip: function () {
+      $('[data-toggle="tooltip"]').tooltip();
+    },
+
+    /* Multi Type */
+    directoristListingType: function () {
+      $(".directorist-thumb-listing-author")
+        .closest(".directorist-listing-single")
+        .addClass("directorist-listing-has-thumb-active");
+      $(".theme-header-action__author-info>img").on("click", function () {
+        $(this).closest(".theme-search-dropdown").toggleClass("active");
+      });
+
+      $("body").on("click", function (e) {
+        if (!$(e.target).closest(".theme-search-dropdown").length) {
+          $(".theme-search-dropdown").removeClass("active");
+        }
+      });
+    },
+
+    GlobalDropdown: function () {
+      $(
+        ".theme-search-dropdown .theme-search-dropdown__input input, .directorist-search-form .theme-search-dropdown .theme-search-dropdown__label"
+      ).on("click", function () {
+        $(this).closest(".theme-search-dropdown").toggleClass("active");
+      });
+
+      $("body").on("click", function (e) {
+        if (!$(e.target).closest(".theme-search-dropdown").length) {
+          $(".theme-search-dropdown").removeClass("active");
+        }
+      });
+    },
+
+    /* Swiper Slider */
+    swiperSlider: function () {
+      /* Check Slider Data */
+      let checkData = function (data, value) {
+        return typeof data === "undefined" ? value : data;
+      };
+
+      /* Swiper Slider */
+      let swiperCarousel = document.querySelectorAll(".theme-swiper");
+      let swiperCarouselNested = document.querySelectorAll(
+        ".theme-swiper-nested"
+      );
+      swiperCarousel.forEach(function (el, i) {
+        let hasPagination = false;
+        let hasNav = false;
+        const alllistingSlider = el.closest(".theme-swiper-slider");
+        el.classList.add(`theme-swiper-${i}`);
+
+        if (alllistingSlider) {
+          alllistingSlider
+            .querySelector(".theme-swiper-slider__top")
+            .childNodes.forEach((elm) => {
+              if (elm.className === "theme-swiper-button-nav-wrap") {
+                hasNav = true;
+              }
+            });
+        } else if (el.querySelector(".theme-swiper-button-nav-wrap")) {
+          hasNav = true;
+        }
+
+        let navBtnPrev = el.querySelectorAll(".theme-swiper-button-prev");
+        let navBtnNext = el.querySelectorAll(".theme-swiper-button-next");
+        if (alllistingSlider) {
+          navBtnPrev = alllistingSlider.querySelectorAll(
+            ".theme-swiper-button-prev"
+          );
+          navBtnNext = alllistingSlider.querySelectorAll(
+            ".theme-swiper-button-next"
+          );
+        }
+
+        el.childNodes.forEach((elc) => {
+          if (elc.className === "theme-swiper-pagination") {
+            hasPagination = true;
+          }
+          if (elc.className === "theme-swiper-navigation") {
+            hasNav = true;
+          }
+        });
+
+        const paginationElement = document.querySelectorAll(
+          ".theme-swiper-pagination"
+        );
+        hasNav &&
+          navBtnPrev.forEach((el) => {
+            el.classList.add(`theme-swiper-button-prev-${i}`);
+          });
+        hasNav &&
+          navBtnNext.forEach((el) => {
+            el.classList.add(`theme-swiper-button-next-${i}`);
+          });
+
+        hasPagination &&
+          paginationElement.forEach((el) =>
+            el.classList.add(`theme-swiper-pagination-${i}`)
+          );
+        let swiper1 = new Swiper(`.theme-swiper-${i}`, {
+          slidesPerView: parseInt(checkData(el.dataset.swItems, 4)),
+          spaceBetween: parseInt(checkData(el.dataset.swMargin, 30)),
+          loop: checkData(el.dataset.swLoop, true),
+          slidesPerGroup: parseInt(checkData(el.dataset.swPerslide, 2)),
+          speed: parseInt(checkData(el.dataset.swSpeed, 3000)),
+          autoplay: checkData(el.dataset.swAutoplay, {}),
+          freeMode: checkData(el.dataset.swFreemode, false),
+          watchSlidesProgress: checkData(el.dataset.swWatchprogress, false),
+          slideToClickedSlide: checkData(
+            el.dataset.swslidetoclickedside,
+            false
+          ),
+          navigation: {
+            nextEl: `.theme-swiper-button-next-${i}`,
+            prevEl: `.theme-swiper-button-prev-${i}`,
+          },
+          pagination: {
+            el: `.theme-swiper-pagination-${i}`,
+            type: "bullets",
+            clickable: true,
+          },
+          breakpoints: checkData(
+            el.dataset.swResponsive
+              ? JSON.parse(el.dataset.swResponsive)
+              : undefined,
+            {}
+          ),
+        });
+
+        var swiper2 = new Swiper(".product-gallery-main", {
+          spaceBetween: 10,
+          loop: true,
+          thumbs: {
+            swiper: swiper1,
+          },
+          pagination: {
+            el: ".swiper-pagination",
+            type: "fraction",
+          },
+        });
+      });
+
+      swiperCarouselNested.forEach(function (el, i) {
+        let navBtnPrevNested = document.querySelectorAll(
+          ".theme-swiper-button-prev-nested"
+        );
+        let navBtnNextNested = document.querySelectorAll(
+          ".theme-swiper-button-next-nested"
+        );
+
+        navBtnPrevNested.forEach((el, i) => {
+          el.classList.add(`theme-swiper-button-prev-nested-${i}`);
+        });
+        navBtnNextNested.forEach((el, i) => {
+          el.classList.add(`theme-swiper-button-next-nested-${i}`);
+        });
+        el.classList.add(`theme-swiper-nested-${i}`);
+        let swiper = new Swiper(`.theme-swiper-nested-${i}`, {
+          slidesPerView: checkData(parseInt(el.dataset.swItems), 4),
+          spaceBetween: checkData(parseInt(el.dataset.swMargin), 30),
+          loop: checkData(el.dataset.swLoop, true),
+          slidesPerGroup: checkData(parseInt(el.dataset.swPerslide), 1),
+          speed: checkData(parseInt(el.dataset.swSpeed), 3000),
+          autoplay: checkData(el.dataset.swAutoplay, {}),
+          observer: true,
+          observeParents: true,
+          navigation: {
+            nextEl: `.theme-swiper-button-next-nested`,
+            prevEl: `.theme-swiper-button-prev-nested`,
+          },
+          pagination: {
+            el: `.theme-swiper-pagination-nested`,
+            type: "bullets",
+            clickable: true,
+          },
+          breakpoints: checkData(
+            el.dataset.swResponsive
+              ? JSON.parse(el.dataset.swResponsive)
+              : undefined,
+            {}
+          ),
+        });
+      });
+    },
+
+    /* Search Categories */
+    searchCategories: function () {
+      $("#search-icon").on("click", function (event) {
+        event.preventDefault();
+        $("#search-menu").addClass("open");
+        $("#search-menu > form > input").focus();
+      });
+      $("#search-menu button.close,#search-menu").on(
+        "click keyup",
+        function (event) {
+          if (
+            event.target == this ||
+            event.target.className == "close" ||
+            event.keyCode == 27
+          ) {
+            $(".search-menu").removeClass("open");
+          }
+        }
+      );
+
+      $(".wpcf7-form-control-wrap textarea").each(function () {
+        $(this).attr("rows", 6);
+      });
+
+      // var selectW = $('.search_fields');
+      // if (selectW) {
+      // 	selectW.select2({
+      // 		placeholder: atbdp_search_listing.i18n_text.category_selection,
+      // 		allowClear: true,
+      // 		templateResult: function (data) {
+      // 			// We only really care if there is an element to pull classes from
+      // 			if (!data.element) {
+      // 				return data.text;
+      // 			}
+
+      // 			var $element = $(data.element);
+
+      // 			var $wrapper = $('<span></span>');
+      // 			$wrapper.addClass($element[0].className);
+
+      // 			$wrapper.text(data.text);
+
+      // 			return $wrapper;
+      // 		},
+      // 	});
+      // };
+    },
+    /* Contact Button  */
+    contactButton: function () {
+      if ($("#ddoctors-contact-owner-form") !== null) {
+        $("body").on("submit", "#ddoctors-contact-owner-form", function (e) {
+          e.preventDefault();
+
+          $("#directorist-contact-message-display").append(
+            '<div class="atbdp-spinner"></div>'
+          );
+
+          // Post via AJAX
+          const data = {
+            action: "atbdp_public_send_contact_email",
+            post_id: $("#ddoctors-post-id").val(),
+            name: $("#atbdp-contact-name").val(),
+            email: $("#atbdp-contact-email").val(),
+            listing_email: $("#atbdp-listing-email").val(),
+            message: $("#atbdp-contact-message").val(),
+            directorist_nonce: directorist.directorist_nonce,
+          };
+
+          $.post(
+            ddoctors_localize_data.ajaxurl,
+            data,
+            function (response) {
+              if (response.error == 1) {
+                $("#directorist-contact-message-display")
+                  .addClass("text-danger")
+                  .html(response.message);
+              } else {
+                $("#atbdp-contact-message").val("");
+                $("#directorist-contact-message-display")
+                  .addClass("text-success")
+                  .html(response.message);
+              }
+            },
+            "json"
+          );
+        });
+      }
+    },
+
+    updateSidebarSearchForm: function () {
+      $("body").on("click", ".directorist-category-select", function (event) {
+        var listing_type = $("#listing_type").val();
+        var cat_id = $(this).val();
+        var form_data = new FormData();
+        var custom_field = $(
+          ".directorist-category-select option[value=" + cat_id + "]"
+        ).attr("data-custom-field");
+        /* if( ! custom_field ){
+				  return;
+				} */
+
+        $(".sidebar-search").addClass("atbdp-form-fade");
+        form_data.append(
+          "action",
+          "theme_directorist_category_custom_field_search"
+        );
+        form_data.append("listing_type", listing_type);
+        form_data.append("cat_id", cat_id);
+        $.ajax({
+          method: "POST",
+          processData: false,
+          contentType: false,
+          url: atbdp_search.ajax_url,
+          data: form_data,
+          success: function success(response) {
+            if (response) {
+              $(".sidebar-search").empty().html(response["search_form"]);
+            }
+
+            $(".directorist-category-select option[value=" + cat_id + "]").attr(
+              "selected",
+              true
+            );
+            $(".directorist-category-select option").attr(
+              "data-custom-field",
+              1
+            );
+            var events = [
+              new CustomEvent("directorist-search-form-nav-tab-reloaded"),
+              new CustomEvent("directorist-reload-select2-fields"),
+              new CustomEvent("directorist-reload-map-api-field"),
+            ];
+            events.forEach(function (event) {
+              document.body.dispatchEvent(event);
+            });
+            $(".sidebar-search").removeClass("atbdp-form-fade");
+            theme;
+          },
+          error: function error(_error) {
+            console.log(_error);
+          },
+        });
+      }); // load custom fields of the selected category in the search form
+    },
+
+    updateListingSortBy: function () {
+      $("body").on(
+        "click",
+        ".directorist-sortby-dropdown #directorsit-listing-sort .directorist-dropdown__links--single",
+        function (event) {
+          var sortText = document.querySelector(
+            ".directorist-sortby-dropdown .directorist-dropdown__toggle"
+          );
+          var updatedSortText = document.querySelector(
+            ".directorist-sortby-dropdown #directorsit-listing-sort .directorist-dropdown__links--single.active"
+          ).innerHTML;
+          if (updatedSortText) {
+            sortText.innerHTML = updatedSortText;
+          }
+        }
+      );
+    },
+  };
+
+  window.addEventListener(
+    "directorist-reload-listings-map-archive",
+    function () {
+      theme.sliderRange();
+      theme.select2Custom();
+      theme.GlobalDropdown();
+    }
+  );
+
+  window.addEventListener(
+    "directorist-search-form-nav-tab-reloaded",
+    function () {
+      theme.GlobalDropdown();
+      theme.sliderRange();
+      theme.select2Custom();
+    }
+  );
+  window.addEventListener("directorist-instant-search-reloaded", function () {
+    theme.GlobalDropdown();
+    theme.sliderRange();
+    theme.select2Custom();
+  });
+
+  theme.responsiveMenuTrigger();
+
+  $(window).resize(function () {
+    theme.responsiveMenuTrigger();
+  });
+
+  function content_ready_scripts() {
+    theme.favouriteButton();
+    theme.select2Custom();
+    theme.svgInline();
+    theme.accordion();
+    theme.swiperSlider();
+    theme.sliderRange();
+    //theme.filter();
+    theme.sidebarCollapse();
+    theme.searchCategories();
+    theme.rating();
+    theme.searchFieldsAction();
+    theme.accordion();
+    theme.toolTip();
+    theme.directoristListingType();
+    theme.magnificPopup();
+    theme.updateListingSortBy();
+    if ($(".theme-counter").length !== 0) {
+      theme.counterUpPlugin();
+    }
+
+    theme.contactButton();
+    theme.updateSidebarSearchForm();
+  }
+
+  $(document).ready(function () {
+    content_ready_scripts();
+    theme.mobileMenu(".menu-item a", ".sub-menu");
+    updateRadioInputIdAttrs();
+    theme.GlobalDropdown();
+  });
+
+  $(window).on("load", initSetup);
+  $(document.body).on("directorist-search-form-nav-tab-reloaded", initSetup);
+
+  function updateRadioInputIdAttrs() {
+    $(".directorist-ddoctors-radio-circle").each(function (index, element) {
+      let radio = $(element).find('input[type="radio"]');
+      let label = $(element).find("label");
+
+      radio.prop("id", radio.attr("id") + index);
+      label.prop("for", radio.attr("id"));
+    });
+  }
+
+  function initSetup() {
+    theme.returnTop();
+    updateRadioInputIdAttrs();
+    theme.preloader();
+    theme.sidebarCollapse();
+  }
+
+  /* Elementor Edit Mode */
+  $(window).on("elementor/frontend/init", function () {
+    setTimeout(() => {
+      if (elementorFrontend.isEditMode()) {
+        //elementorFrontend.hooks.addAction('frontend/element_ready/widget', function () {
+        content_ready_scripts();
+        //});
+      }
+    }, 6000);
+  });
+
+  $("body").on(
+    "click",
+    ".ddoctors-all-listing-filter .mixitup-filter li",
+    function () {
+      $(this).attr("data-filter");
+      $("li").removeClass("active");
+      $(this).addClass("active");
+
+      var dirTypes = $(".ddoctors-all-listing-filter .mixitup-filter").attr(
+        "data-dir-type"
+      );
+      var count = $(".ddoctors-all-listing-filter .mixitup-filter").attr(
+        "data-count"
+      );
+      var cat = $(this).attr("data-filter");
+
+      var preloader = ddoctors_localize_data.preloader;
+      var loader = `<div id="listing-preloader" class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+							<div class="theme-preloader-wrapper">
+								<img class="svg" src="${preloader}">
+							</div>
+						</div>`;
+
+      $.ajax({
+        url: ddoctors_localize_data.ajaxurl,
+        type: "POST",
+
+        data: {
+          action: "all_listing_category_filter",
+          cat_slug: cat,
+          count: count,
+          nonce: ddoctors_localize_data.nonce,
+          directory_types: JSON.parse(dirTypes),
+        },
+        beforeSend: function () {
+          $(".ddoctors-all-listing-filter .mixitup-container").html(loader);
+        },
+        success: function (data) {
+          if (data) {
+            $(".ddoctors-all-listing-filter .mixitup-container").html(data.all_listing_filter);
+          }
+        },
+      });
+    }
+  );
+})(jQuery);
